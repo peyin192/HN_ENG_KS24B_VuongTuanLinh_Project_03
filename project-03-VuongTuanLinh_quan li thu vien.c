@@ -105,8 +105,7 @@ int main(){
 							
                         
                         
-                        default:
-                            printf("Lua chon khong hop le.\n");
+                        
                     }
                 } while (bookChoice != 7);
                 break;
@@ -150,8 +149,7 @@ int main(){
             case 3:
                 printf("Thoat chuong trinh.\n");
                 break;
-            default:
-                printf("Lua chon khong hop le.\n");
+            
         }
     } while (choose != 3);
 	
@@ -195,18 +193,19 @@ void displayBook(Book books[], int count){
 }
 
 int decentBook(Book book, Book books[], int count){
+	
 	if(book.id<=0||book.price<=0){
 		printf("Ma hoac gia sach khong hop le, vui long nhap lai: \n");
-		
+		return 0;
 	}
 	if(strlen(book.title)==0||strlen(book.author)==0||strlen(book.category)==0){
 		printf("Vui long nhap thong tin sach: \n");
 		return 0;
 	}
 	for(int i=0;i<count;i++){
-		if(books[i].id==book.id){
+		if(strcmp(books[i].id,book.id)==0){
 			printf("Id da ton tai, vui long nhap lai: \n");
-			
+			return 0;
 		}
 		if (strcmp(books[i].title, book.title) == 0) {
             printf("Ten sach da ton tai, vui long nhap lai: \n");
@@ -244,7 +243,7 @@ void addBook(Book books[], int *count){
         writeBook(books, *count);
         printf("Them sach thanh cong\n");
     } else {
-        printf("Du lieu sach khong hop le. Vui long thu lai.\n");
+        printf("Du lieu sach khong hop le. Vui long thu lai\n");
     }
 }
 
@@ -252,6 +251,11 @@ void addBook(Book books[], int *count){
 
 void editBook(Book books[], int count){
 	char idsr[50];
+	char newTitle[50];
+	char newAuthor[50];
+	float newPrice;
+	char newCategory[50];
+	int ck=0;
 	
 	printf("Hay nhap id ban muon sua: ");
 	scanf("%s",&idsr);
@@ -262,30 +266,69 @@ void editBook(Book books[], int count){
 	for(int i=0;i<count;i++){
 		if(strcmp(books[i].id, idsr) == 0){
 			printf("| %-5s | %-30s | %-25s | %-10.f | %-15s |\n", books[i].id, books[i].title, books[i].author, books[i].price, books[i].category);
-			printf("Nhap them sach moi: ");
+			printf("Nhap ten sach moi: ");
 			getchar();
-			fgets(books[i].title,sizeof(books[i].title),stdin);
-			books[i].title[strcspn(books[i].title, "\n")] = 0;
+			fgets(newTitle,sizeof(newTitle),stdin);
+			newTitle[strcspn(newTitle, "\n")] = 0;
+			if(strlen(newTitle)==0){
+				printf("Vui long nhap thong tin\n");
+				return;
+			}else{
+				ck++;
+				//strcpy(books[i].title,newTitle);
+				//writeBook(books,count);
+			}
+			
 			
 			printf("Nhap tac gia moi: ");
-			fgets(books[i].author,sizeof(books[i].author),stdin);
-			books[i].author[strcspn(books[i].author, "\n")] = 0;
+			fgets(newAuthor,sizeof(newAuthor),stdin);
+			newAuthor[strcspn(newAuthor, "\n")] = 0;
+			if(strlen(newAuthor)==0){
+				printf("Vui long nhap thong tin\n");
+				return 0;
+			}else{
+				ck++;
+				//strcpy(books[i].author,newAuthor);
+				//writeBook(books,count);
+			}
+			
 			
 			printf("Nhap gia sach moi: ");
-			scanf("%f",&books[i].price);
+			scanf("%f",&newPrice);
 			getchar();
+			if(newPrice<=0){
+				printf("Vui long nhap thong tin\n");
+				return 0;
+			}else{
+				ck++;
+				//books[i].price=newPrice;
+				//writeBook(books,count);
+			}
 			
 			printf("Nhap the loai sach moi: ");
-			fgets(books[i].category,sizeof(books[i].category),stdin);
-			books[i].category[strcspn(books[i].category, "\n")] = 0;
-			
-			if(decentBook(books[i],books, count)){
-				writeBook(books,count);
-				printf("Cap nhap thong tin sach thanh cong");
-				
+			fgets(newCategory,sizeof(newCategory),stdin);
+			newCategory[strcspn(newCategory, "\n")] = 0;
+			if(strlen(newCategory)==0){
+				printf("Vui long nhap thong tin\n");
+				return 0;
 			}else{
-				printf("Du lieu khong hop le, vui long thu lai");
+				ck++;
+				//strcpy(books[i].category,newCategory);
 			}
+			if(ck==4){
+				printf("Sua thong tin sach thanh cong");
+				strcpy(books[i].title,newTitle);
+				strcpy(books[i].author,newAuthor);
+				books[i].price=newPrice;
+				strcpy(books[i].category,newCategory);
+				writeBook(books,count);
+				
+				
+			}
+			
+			
+			
+			
 			return;
 			
 		}
@@ -308,7 +351,7 @@ void deleteBook(Book books[], int *count){
 		case 1: {
 			for(int i=0;i<*count;i++){
 				if(strcmp(books[i].id, iddel) == 0){
-					for(int j=0;j<*count-1;j++){
+					for(int j=i;j<*count-1;j++){
 						books[j]=books[j+1];
 			}
 			(*count)--;
@@ -317,7 +360,7 @@ void deleteBook(Book books[], int *count){
 			return;
 		}
 	}
-	printf("Id khong ton tai");
+	printf("Id khong ton tai\n");
 	
 			break;
 		}
@@ -364,7 +407,7 @@ void sortBook(Book books[], int count){
                         }
                     }
                 }
-                printf("Sap xep thanh cong");
+                printf("Sap xep thanh cong\n");
                 displayBook(books,count);
                 writeBook(books,count);
 				break;
@@ -390,11 +433,15 @@ void searchBook(Book books[], int count){
 	for(int i=0;i<count;i++){
 		//char nameTitlecheck[50];
 		strcpy(nameTitlecheck,books[i].title);
+		//printf("| %-5s | %-30s | %-25s | %-10s | %-15s |\n", "ID", "Title", "Author", "Price", "Category");
+    	//printf("|-------|--------------------------------|---------------------------|------------|-----------------|\n");
 		for(int j=0;nameTitlecheck[j];j++){
 			nameTitlecheck[j] = tolower(nameTitlecheck[j]);
 		}
+			//printf("| %-5s | %-30s | %-25s | %-10s | %-15s |\n", "ID", "Title", "Author", "Price", "Category");
+    		//printf("|-------|--------------------------------|---------------------------|------------|-----------------|\n");
 		if(strstr(nameTitlecheck,namesrc)!=NULL){
-			printf("| %-5s | %-30s | %-25s | %-10s | %-15s |\n", "ID", "Title", "Author", "Price", "Category");
+			//printf("| %-5s | %-30s | %-25s | %-10s | %-15s |\n", "ID", "Title", "Author", "Price", "Category");
     		printf("|-------|--------------------------------|---------------------------|------------|-----------------|\n");
 			printf("| %-5s | %-30s | %-25s | %-10.f | %-15s |\n", books[i].id, books[i].title, books[i].author, books[i].price, books[i].category);
 		}else{
@@ -484,6 +531,9 @@ void addMember(Member members[], int *flag) {
 
 void editMember(Member members[],int flag){
 	char idSrcmem[20];
+	char newName[50];
+	char newPhone[50];
+	int ok=0;
 	
 	printf("Nhap id khach hang: ");
 	scanf("%s",&idSrcmem);
@@ -491,25 +541,46 @@ void editMember(Member members[],int flag){
 	for(int i=0;i<flag;i++){
 		if(strcmp(members[i].memberId,idSrcmem)==0){
 			printf("| %-15s | %-50s | %-15s |\n", "Member ID", "Name", "Phone");
-            printf("|-----------------|------------------------------------------------|-----------------|\n");
+            printf("|-----------------|----------------------------------------------------|-----------------|\n");
             printf("| %-15s | %-50s | %-15s |\n", members[i].memberId, members[i].name, members[i].phone);
             
             printf("Nhap ten moi: ");
             getchar();
-            fgets(members[i].name,sizeof(members[i].name),stdin);
-            members[i].name[strcspn(members[i].name, "\n")] = 0;
+            fgets(newName,sizeof(newName),stdin);
+            newName[strcspn(newName, "\n")] = 0;
+            if(strlen(newName)==0){
+            	printf("Vui long nhap thong tin\n");
+            	return 0;
+            	
+			}else{
+				ok++;
+			}
 
             
             printf("Nhap so dien thoai moi: ");
-            fgets(members[i].phone,sizeof(members[i].phone),stdin);
-            members[i].phone[strcspn(members[i].phone, "\n")] = 0;
+            fgets(newPhone,sizeof(newPhone),stdin);
+            newPhone[strcspn(newPhone, "\n")] = 0;
+            if(strlen(newPhone)==0){
+            	printf("Vui long nhap thong tin\n");
+            	return 0;
+            	
+			}else{
+				ok++;
+				
+			}
+			if(ok==2){
+				printf("Cap nhap thong tin thanh cong\n");
+				strcpy(members[i].name,newName);
+				strcpy(members[i].phone,newPhone);
+				writeMem(members,flag);
+			}
             
-            writeMem(members,flag);
-            printf("Cap nhap thong tin thanh cong\n");
+            //writeMem(members,flag);
+            //printf("Cap nhap thong tin thanh cong\n");
             return;
 		}
 	}
-	printf("Khong tim thay id khach hang");
+	printf("Khong tim thay id khach hang\n");
 }
 searchMember(Member members[],int flag){
 	char memberSrc[50];
@@ -532,8 +603,8 @@ searchMember(Member members[],int flag){
 			
 		}
 		if(strstr(memberCheck,memberSrc)!=NULL){
-			printf("| %-5s | %-30s | %-25s |\n", "ID", "Name", "Phone");
-    		printf("|-------|--------------------------------|---------------------------|-----------------|\n"); 		
+			//printf("| %-5s | %-30s | %-25s |\n", "ID", "Name", "Phone");
+    		printf("|-------|--------------------------------|---------------------------|\n"); 		
         	printf("| %-5s | %-30s | %-25s |\n", members[i].memberId, members[i].name, members[i].phone);		
 	}else{
 		printf("Khong tim thay khach hang\n");
